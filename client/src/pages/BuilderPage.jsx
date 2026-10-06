@@ -6,6 +6,13 @@ import BuilderHeader from '../components/BuilderHeader';
 import { FolderTreeIcon, MessageSquareIcon } from 'lucide-react';
 import ChatPanel from '../components/ChatPanel';
 import { useEffect } from 'react';
+import FileExplorer from '../components/FileExplorer';
+import PreviewPanel from '../components/PreviewPanel';
+import AgentProgressDashboard from '../assets/builder-ai-assets/components/AgentProgressDashboard';
+import PublishModal from '../components/PublishModal';
+import api from '../api/api';
+import { exportProjectZip } from '../utils/exportProject';
+import { toast } from 'react-hot-toast';
 const BuilderPage = () => {
 
   const { id } = useParams()
@@ -38,10 +45,31 @@ const BuilderPage = () => {
     window.open(`/preview/${id}`, "_blank")
   }
   const handlePublish = async () => {
-
+    if(!id) return;
+    setPublishing(true)
+    try{
+      await api.post(`/api/projects/${id}/publish`);
+      const url = `${window.location.origin}/publish/${id}`;
+      setPublishUrl(url);
+      toast.success("Website published successfully")
+    }
+    catch(error){
+      console.error("Publish failed:", error);
+      toast.error(error?.response?.data?.error || "Publish failed");
+    }
+    finally{
+      setPublishing(false);
+    }
   }
-  const handleDownload = () => {
-
+  const handleDownload = async () => {
+    if (!activeProject) return;
+    try {
+      await exportProjectZip(activeProject);
+      toast.success("Project exported successfully");
+    } catch (error) {
+      console.error("Export failed:", error);
+      toast.error("Failed to export project");
+    }
   }
 
   if (loadingActiveProject || !activeProject) {
@@ -87,14 +115,33 @@ const BuilderPage = () => {
                 <ChatPanel
                   messages={activeProject.messages} onSend={handleChat}
                   loading={chatLoading} />) : (
-                <div> File explorer</div>
+                <FileExplorer files={activeProject.files} activeFile = {activeFile} 
+                onFileSelect={(path) => {
+                  setActiveFile(path);
+                  setShowCode(true)
+                }}/>
               )
             }
 
           </div>
         </div>
         {/* Preview/ Code Area */}
+        <div className="flex-1 overflow-hidden">
+            {activeProject.status === "pending" || activeProject.status === "generating" ||
+            activeProject.status === "failed" ? (
+              <AgentProgressDashboard project={activeProject}/>
+            ) : (
+              <PreviewPanel
+                project={activeProject}
+                activeFile={activeFile}
+                showCode={showCode}
+              />
+            )}
+        </div>
       </div>
+      {publishUrl && <PublishModal publishUrl={publishUrl} onClose={()=>
+        setPublishUrl(null)
+      }/>}
     </div>
   )
 }

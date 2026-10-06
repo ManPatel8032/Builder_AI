@@ -1,7 +1,7 @@
 import { detectDependencies } from "./sandpackUtils";
 
 export async function exportProjectZip(project) {
-    if (!project) return;
+    if (!project || !project.files) return;
     try {
         const JSZip = (await import("jszip")).default;
         const { saveAs } = await import("file-saver");
@@ -113,5 +113,8 @@ createRoot(document.getElementById('root')).render(<App />);
         saveAs(blob, fileName);
     } catch (error) {
         console.error("Export project error:", error);
+        throw error;
     }
 }
+
+export default exportProjectZip;

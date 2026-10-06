@@ -403,7 +403,7 @@ api.defaults.adapter = async (config) => {
             status = 404;
             responseData = { error: "Project not found" };
         }
-    } else if (url.match(/\/api\/projects\/[^/]+\/files$/) && method === "put") {
+    } else if (url.match(/\/api\/projects\/[^/]+(\/files)?$/) && method === "put") {
         const id = url.split("/")[3];
         const files = body.files;
         const projects = getProjects();

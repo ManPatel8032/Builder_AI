@@ -1,9 +1,8 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useState, useEffect, useCallback, useMemo } from "react";
 import api from "../api/api";
-import { useEffect } from "react";
 import { toast } from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
-import { useCallback } from "react";
+import debounce from "lodash.debounce";
 const AppContext = createContext(undefined);
 
 export function AppContextProvider({ children }) {
@@ -36,7 +35,7 @@ export function AppContextProvider({ children }) {
         }
     }
 
-    useEffect(() => { checkSession() }, [checkSession])
+    useEffect(() => { checkSession() }, [])
 
     const login = async (email, password) => {
         try {
@@ -82,7 +81,7 @@ export function AppContextProvider({ children }) {
     }
 
     // Project actions
-    const loadProjects = async () => {
+    const loadProjects = useCallback(async () => {
         if (!user) return;
         try {
             const { data } = await api.get("/api/projects");
@@ -94,9 +93,9 @@ export function AppContextProvider({ children }) {
         finally {
             setLoadingProjects(false);
         }
-    }
+    }, [user]);
 
-    const loadProject = async (id, silent = false) => {
+    const loadProject = useCallback(async (id, silent = false) => {
         if (!user) return;
         if (!silent) setLoadingActiveProject(true);
         try {
@@ -125,7 +124,7 @@ export function AppContextProvider({ children }) {
             }
         }
 
-    }
+    }, [user, navigate]);
 
     // Automatically poll active projects
     useEffect(() => {
@@ -203,7 +202,33 @@ export function AppContextProvider({ children }) {
 
     )
 
+    const debouncedSave = useMemo(() => debounce(async (files, id) => {
+        if (!activeProject || !user) return;
+        try {
+            await api.put(`/api/projects/${activeProject._id}`, { files });
+        } catch (err) {
+            console.error("Failed to save project", err);
+            toast.error("Failed to save project");
+        }
 
+    }, 1000), [activeProject, user]);
+
+    useEffect(() => {
+        return () =>{
+            debouncedSave.cancel();
+        }
+    }, [debouncedSave])
+    
+    const updateProjectFiles = useCallback(
+        (files) => {
+            if (!activeProject || !user) return;
+            setActiveProject((prev) => ({
+                ...prev,
+                files
+            }))
+            debouncedSave(files, activeProject._id);
+        }, [activeProject, user, debouncedSave]
+    )
 
     return (
         <AppContext.Provider value={{
@@ -227,6 +252,7 @@ export function AppContextProvider({ children }) {
             handleDelete,
             logout,
             handleChat,
+            updateProjectFiles
         }}>
             {children}
         </AppContext.Provider>

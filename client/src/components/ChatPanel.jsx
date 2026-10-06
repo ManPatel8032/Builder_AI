@@ -1,7 +1,7 @@
 import { BotIcon, BotMessageSquareIcon, UserIcon } from 'lucide-react'
 import React, { useEffect, useRef } from 'react'
 import PromptInput from "./PrompInput"
-const ChatPanel = ({ messages, onSend, loading }) => {
+const ChatPanel = ({ messages = [], onSend, loading }) => {
 
     const bottomRef = useRef(null)
     useEffect(() => {
@@ -44,7 +44,7 @@ const ChatPanel = ({ messages, onSend, loading }) => {
                     </div>
                 ))}
                 {loading && (
-                    <div className='flex gap2.5 items-start'>
+                    <div className='flex gap-2.5 items-start'>
                         <div className='shrink-0 w-6  h-6 rounded-md flex items-center justify-center mt-0.5 bg-zinc-900/5'>
                             <BotIcon size={13} className='text-zinc-900' />
                         </div>

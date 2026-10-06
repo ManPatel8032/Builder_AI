@@ -3,7 +3,7 @@ import LoginLeft from '../components/LoginLeft';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAppContext } from '../context/AppContext';
-import { EyeOffIcon, EyeIcon } from 'lucide-react';
+import { EyeOffIcon, EyeIcon, Loader2Icon } from 'lucide-react';
 import {useNavigate} from 'react-router-dom';
 
 const AuthPage = ({ mode }) => {
@@ -35,7 +35,7 @@ const AuthPage = ({ mode }) => {
       navigate("/");
     }
     catch (err) {
-      setError(err.message || mode == "login" ? "Invalid Email or Password" : "Registration Failed");
+      setError(err.message || (mode == "login" ? "Invalid Email or Password" : "Registration Failed"));
     } finally {
       setloading(false);
     }

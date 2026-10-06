@@ -2,15 +2,16 @@ import React from 'react'
 import { useState, useRef } from 'react';
 import { useEffect } from 'react';
 import { ArrowRightIcon, CloudUploadIcon, Loader2Icon, MicIcon } from 'lucide-react';
-const PrompInput = ({ onSubmit, loading = false, placeholder = "Describe website you want", large = false, autofocus = false, variant = "default" }) => {
+const PrompInput = ({ onSubmit, loading = false, placeholder = "Describe website you want", large = false, autoFocus = false, autofocus = false, variant = "default" }) => {
     const [value, setValue] = useState("");
     const textareaRef = useRef(null);
+    const shouldAutoFocus = autoFocus || autofocus;
 
     useEffect(()=>{
-        if(autofocus && textareaRef.current){
+        if(shouldAutoFocus && textareaRef.current){
             textareaRef.current.focus();
         }
-    },[autofocus])
+    },[shouldAutoFocus])
 
     const handleSubmit = (e) => {
         if (e) e.preventDefault();
@@ -34,7 +35,7 @@ const PrompInput = ({ onSubmit, loading = false, placeholder = "Describe website
                     className="w-full p-4 pb-2 resize-none placeholder:text-white/60 outline-none bg-transparent text-white text-base" />
 
                 <div className='flex items-center justify-between px-3 pb-3 gap-2'>
-                    <label htmlFor="file" className="border boder-white/20 text-white/80 hover:text-white hover:border-white/30 p-1.5 rounded-md cursor-pointer flex items-center justify-center">
+                    <label htmlFor="file" className="border border-white/20 text-white/80 hover:text-white hover:border-white/30 p-1.5 rounded-md cursor-pointer flex items-center justify-center">
                         <input type="file" id='file' hidden />
                         <CloudUploadIcon size={18} />
                     </label>
