@@ -1,11 +1,5 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react';
-import {
-  SandpackProvider,
-  SandpackLayout,
-  SandpackCodeEditor,
-  SandpackPreview,
-  useSandpack
-} from '@codesandbox/sandpack-react';
+import {SandpackProvider,SandpackLayout,SandpackCodeEditor,SandpackPreview,useSandpack} from '@codesandbox/sandpack-react';
 import { useAppContext } from '../context/AppContext';
 import { detectDependencies } from '../utils/sandpackUtils';
 
