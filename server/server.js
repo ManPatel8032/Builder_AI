@@ -4,6 +4,7 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import { connectToDatabase } from "./config/db.js";
 import authRouter from "./routes/authRoutes.js";
+import ProjectRouter from "./routes/projectRoutes.js";
 
 const app = express();
 
@@ -14,7 +15,8 @@ app.use(cookieParser())
 app.use(express.json())
 
 app.get("/", (req, res) => res.send("Server is live!"))
-app.use('/api/auth', authRouter)
+app.use('/api/auth', authRouter);
+app.use('/api/projects', ProjectRouter);
 
 //Centralized error handler
 app.use((err, _req, res, _next) => {
