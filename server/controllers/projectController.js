@@ -4,6 +4,7 @@
 
 import { Project } from "../models/project.js";
 import crypto from 'crypto';
+import { generateProject } from "../services/ai.js";
 
 function hashContent(content) {
     return crypto.createHash('md5').update(content).digest('hex').slice(0, 12);
@@ -61,7 +62,86 @@ export async function createProject(req, res) {
 
 // background worker to progressive generate files and update database in real time
 async function runBackgroundGeneration(projectId, prompt) {
+    try {
+        console.log(`[Bg AI] Starting background generation for project ${projectId}`);
+        const result = await generateProject(prompt, {
+            onPlan: async (plan) => {
+                console.log(`[Background AI] Plan created for project ${projectId}. Planned
+                ${plan.files.length} files.`);
+                const fileList = plan.files.map((f) => `- \`${f.path}\`: ${f.description}`).join("\n")
+                
+                await Project.findByIdAndUpdate(projectId, {
+                    name: plan.projectName || "Generated Project",
+                    status: "generating",
+                    filesPlanned: plan.files,
+                    $push:{
+                        messages:{
+                            role: "assistant",
+                            content: `Plan website structure: \n${fileList}`,
+                            timestamp: new Date(),
+                        }
+                    }
+                })
+            },
+            onFileStart: async (path) =>{
+                console.log(`[Background AI] Starting file ${path} for project ${projectId}`);
+                await Project.findByIdAndUpdate(projectId, {
+                    currentFile: path,
+                })
+            },
+            onFileComplete: async (path, code) =>{
+                console.log(`[Background AI] Finished file ${path} for project ${projectId}`);
+                const project = await Project.findById(projectId);
+                if(project){
+                    project.files = project.files || {};
+                    project.files[path] = { content: code, hash: hashContent(code)};
+                    project.filesGenerated = [...(project.filesGenerated || []),
+                        path
+                    ];
 
+                    project.messages.push({
+                        role:"assistant",
+                        content: `Create file "${path}"`,
+                        timestamp: new Date(),
+                    });
+                    project.currentFile = null;
+                    project.markModified("files");
+                    await project.save();
+                }
+            }
+
+        })
+        console.log(`[Background AI] Successfully generated project ${projectId}`);
+        const project = await Project.findById(projectId);
+
+        if(project){
+            project.status = "completed";
+            project.version = 1;
+            if(result.description){
+                project.name = result.description;
+            }
+            project.messages.push({
+                role:"assistant",
+                content: `Website generation complete ! You can view and edit files.`,
+                timestamp: new Date(),
+            })
+            await project.save();
+        }
+        
+    } catch (err) {
+        console.error(`[Background AI] Fatal generation error for project ${projectId}:`, err);
+        await Project. findByIdAndUpdate(projectId, {
+            status: "failed",
+            error: err.message,
+            $push: {
+                messages: {
+                    role: "assistant",
+                    content: `Generation Failed : ${err.message}`,
+                    timestamp: new Date(),
+                }
+            }
+        })
+    }
 }
 
 // GET /api/projects

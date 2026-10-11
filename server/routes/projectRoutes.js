@@ -1,7 +1,7 @@
 import {Router} from "express";
 import { getPublicProject, createProject, listProjects, getProject, deleteProject, updateProjectFiles, publishProject} from "../controllers/projectController.js";
 import { authMiddleware } from "../middleware/authMiddleware.js";
-
+import { chat } from "../controllers/chatController.js";
 const ProjectRouter = Router();
 
 // Public route
@@ -16,5 +16,9 @@ ProjectRouter.delete('/:id', deleteProject);
 ProjectRouter.put('/:id', updateProjectFiles);
 ProjectRouter.put('/:id/files', updateProjectFiles);
 ProjectRouter.post('/:id/publish', publishProject);
+
+//Chat
+
+ProjectRouter.post("/:id/chat", chat);
 
 export default ProjectRouter;
