@@ -110,6 +110,13 @@ export function validateAndFixCode(code, filePath, context) {
         warnings.push(`${filePath}: Added missing React import`);
     }
 
+    // 9. Auto-fix unescaped/unterminated {' in JSX text nodes
+    const unclosedCurlyRegex = />([^<]*?)\{'\s*<\/([a-zA-Z])/g;
+    if (unclosedCurlyRegex.test(code)) {
+        code = code.replace(/>([^<]*?)\{'\s*<\/([a-zA-Z])/g, (match, prefix, tag) => `>${prefix}&#123;</${tag}`);
+        warnings.push(`${filePath}: Sanitized unclosed {' in JSX text`);
+    }
+
     // 9. Fix import paths that point to incorrect folders/paths compared to what was planned
     if (context?.allPlannedFiles) {
         const fixResult = fixImportPaths(code, filePath, context.allPlannedFiles);

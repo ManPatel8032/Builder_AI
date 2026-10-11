@@ -33,8 +33,8 @@ function SandpackFileWatcher({ onLiveFilesChange }) {
       }
     }
 
-    onLiveFilesChange(updatedFiles);
     if (hasChanges) {
+      onLiveFilesChange(updatedFiles);
       updateProjectFiles(updatedFiles);
     }
   }, [sandpack.files, onLiveFilesChange, updateProjectFiles]);
@@ -74,13 +74,10 @@ export default function PreviewPanel({ project, activeFile, showCode }) {
   
   // Keep local state of files that updates as user types
   const [liveFiles, setLiveFiles] = useState(project.files);
-  const [previousProjectKey, setPreviousProjectKey] = useState(`${project._id}-${project.version}`);
 
-  const currentKey = `${project._id}-${project.version}`;
-  if (previousProjectKey !== currentKey) {
-    setPreviousProjectKey(currentKey);
+  useEffect(() => {
     setLiveFiles(project.files);
-  }
+  }, [project._id, project.version, project.files]);
 
   // Convert liveFiles to Sandpack format
   const sandpackFiles = useMemo(() => {

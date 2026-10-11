@@ -202,33 +202,35 @@ export function AppContextProvider({ children }) {
 
     )
 
-    const debouncedSave = useMemo(() => debounce(async (files, id) => {
-        if (!activeProject || !user) return;
+    const activeProjectRef = useRef(activeProject);
+    useEffect(() => {
+        activeProjectRef.current = activeProject;
+    }, [activeProject]);
+
+    const debouncedSave = useMemo(() => debounce(async (files, projectId) => {
+        if (!projectId) return;
         try {
-            await api.put(`/api/projects/${activeProject._id}`, { files });
+            await api.put(`/api/projects/${projectId}`, { files });
         } catch (err) {
             console.error("Failed to save project", err);
             toast.error("Failed to save project");
         }
-
-    }, 1000), [activeProject, user]);
+    }, 1000), []);
 
     useEffect(() => {
-        return () =>{
+        return () => {
             debouncedSave.cancel();
-        }
-    }, [debouncedSave])
+        };
+    }, [debouncedSave]);
     
     const updateProjectFiles = useCallback(
         (files) => {
-            if (!activeProject || !user) return;
-            setActiveProject((prev) => ({
-                ...prev,
-                files
-            }))
-            debouncedSave(files, activeProject._id);
-        }, [activeProject, user, debouncedSave]
-    )
+            const currentProj = activeProjectRef.current;
+            if (!currentProj || !user) return;
+            setActiveProject((prev) => (prev ? { ...prev, files } : prev));
+            debouncedSave(files, currentProj._id);
+        }, [user, debouncedSave]
+    );
 
     return (
         <AppContext.Provider value={{

@@ -25,17 +25,7 @@ const BuilderPage = () => {
   useEffect(() => {
     if (!id) return;
     loadProject(id)
-  }, [id])
-
-  useEffect(() => {
-    if (!id || !activeProject) return;
-    if (activeProject.status === "pending" || activeProject.status === "generating") {
-      const interval = setInterval(() => {
-        loadProject(id, true)
-      }, 1500)
-      return () => { clearInterval(interval) }
-    }
-  }, [id, loadProject, activeProject])
+  }, [id, loadProject])
 
 
 
