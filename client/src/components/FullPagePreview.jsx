@@ -11,7 +11,8 @@ const FullPagePreview = ({ files }) => {
     if (!files) return {};
     const spFiles = {};
     for (const [path, content] of Object.entries(files)) {
-      spFiles[path] = { code: content };
+      const fileCode = typeof content === 'string' ? content : content?.content || '';
+      spFiles[path] = { code: fileCode };
     }
     return spFiles;
   }, [files]);

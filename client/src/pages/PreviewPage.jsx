@@ -6,14 +6,14 @@ import { useAppContext } from '../context/AppContext'
 
 const PreviewPage = () => {
   const { id } = useParams()
-  const { activeProject: project, loadingActiveProject: loading, loadingProject } = useAppContext()
+  const { activeProject: project, loadingActiveProject: loading, loadProject } = useAppContext()
 
   useEffect(() => {
     if (id) { 
-      loadingProject(id)
+      loadProject(id)
     }
 
-  }, [id,loadingProject])
+  }, [id, loadProject])
 
   if (loading || !project) {
     return <Loading />
