@@ -4,7 +4,6 @@ import { useParams } from 'react-router-dom'
 import FullPagePreview from '../components/FullPagePreview'
 import api from '../api/api'
 import Loading from '../components/Loading'
-import { AlertCircleIcon } from 'lucide-react'
 
 const PublishPage = () => {
   const { id } = useParams()

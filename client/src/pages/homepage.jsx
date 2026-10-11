@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import { ArrowRightIcon, ClockIcon, Trash2Icon } from 'lucide-react';
 import moment from "moment"
 
-const homepage = () => {
+const HomePage = () => {
   const navigate = useNavigate()
   const { user, projects, loadingProjects, generatingProject, loadProjects, handleGenerate, handleDelete, logout } = useAppContext();
 
@@ -109,4 +109,4 @@ const homepage = () => {
   )
 }
 
-export default homepage
+export default HomePage;
