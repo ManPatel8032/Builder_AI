@@ -5,7 +5,7 @@ const LoginLeft = () => {
         <div className="hidden lg:flex lg:w-2/5 bg-[url('/bg-img.png')] bg-cover bg-center bg-no-repeat flex-col justify-between p-12 shrink-0 select-none">
             <div className='flex items-center gap-3'>
                 <img src="/logo.svg" alt="Logo" className='size-9.5' />
-                <span className='text-4xl font-medium text-white'>Innovative Assignment</span>
+                <span className='text-4xl font-medium text-white'>Builder AI    </span>
             </div>
             <div>
                 <h2 className='text-3xl text-white font-medium leading-snug mb-3 tracking-light' >Build your presence on web</h2>
@@ -17,7 +17,7 @@ const LoginLeft = () => {
                 </p>
                 <p className='text-zinc-300 text-sm mt-12'>
                     Copyright{new Date().getFullYear()} Innovative Assignment. All rights reserved.
-                </p>
+                </p>    
             </div>
         </div>
     )

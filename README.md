@@ -12,7 +12,7 @@
 
 **Turn natural language prompts into live, interactive, full-featured React web applications with real-time in-browser sandboxing and conversational AI revisions.**
 
-[Features](#-key-features) • [Architecture](#-architecture) • [Getting Started](#-getting-started) • [Environment Variables](#-environment-variables) • [API Reference](#-api-endpoints)
+[Features](#-key-features) • [Architecture](#-architecture) • [Getting Started](#-getting-started) • [Environment Variables](#-environment-variables) • [API Reference](#-api-endpoints) • [Codebase Guide](./CODEBASE_GUIDE.md)
 
 </div>
 

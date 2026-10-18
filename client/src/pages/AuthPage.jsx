@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 import { useAppContext } from '../context/AppContext';
 import { EyeOffIcon, EyeIcon, Loader2Icon } from 'lucide-react';
 import {useNavigate} from 'react-router-dom';
+import { hashPassword } from '../utils/crypto';
 
 const AuthPage = ({ mode }) => {
 
@@ -25,11 +26,14 @@ const AuthPage = ({ mode }) => {
     setError("");
 
     try {
+      // Hash the password in the browser before sending — plaintext never leaves the client
+      const hashedPwd = await hashPassword(password);
+
       if (mode == "login") {
-        await login(email, password);
+        await login(email, hashedPwd);
       }
       else {
-        await register(name, email, password);
+        await register(name, email, hashedPwd);
       }
 
       navigate("/");

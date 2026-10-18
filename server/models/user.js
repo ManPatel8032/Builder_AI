@@ -7,14 +7,12 @@ const UserSchema = new Schema({
     password: { type: String, required: true},
 },{timestamps: true});
 
-// Hash password before saving
-UserSchema.pre('save', async function (){
-    if(!this.isModified('password')) return;
-    const salt = await bcrypt.genSalt(10);
-    this.password = await bcrypt.hash(this.password, salt);
-});
+// NOTE: No pre('save') bcrypt hook here.
+// The frontend sends a SHA-256 hash of the password (never the plaintext).
+// The register controller bcrypts that hash before storing it.
+// This prevents double-hashing while keeping bcrypt protection in the DB.
 
-// Compare password method
+// Compare the incoming SHA-256 hash against the bcrypt-stored value
 UserSchema.methods.comparePassword = async function (password){
     return bcrypt.compare(password, this.password);
 }

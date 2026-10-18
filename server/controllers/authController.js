@@ -1,5 +1,6 @@
 import { User } from "../models/user.js"
 import jwt from 'jsonwebtoken'
+import bcrypt from 'bcrypt'
 
 // Helper to set cookie
 const JWT_SECRET = process.env.JWT_SECRET || "fallback_secret"
@@ -29,10 +30,14 @@ export async function register(req, res){
         return;
     }
 
+    // The frontend sends a SHA-256 hash; bcrypt it before storing so DB is protected
+    const salt = await bcrypt.genSalt(10);
+    const bcryptedPassword = await bcrypt.hash(password, salt);
+
     const user = await User.create({
         name: name,
         email: trimmedEmail,
-        password
+        password: bcryptedPassword
     });
 
     setSessionCookie(res, {userId: user._id.toString(), email: user.email})
